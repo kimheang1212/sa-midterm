@@ -13,10 +13,6 @@ interface CartItem {
   quantity: number;
 }
 
-const TELEGRAM_BOT_TOKEN = "7885862457:AAEbwNXfaHqIejJXN2uRJnqemqC_mHRg650";
-const CHAT_ID = "737967316";
-const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-
 const Checkout = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [name, setName] = useState("");
@@ -24,14 +20,21 @@ const Checkout = () => {
   const [address, setAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Credit Card");
   const [error, setError] = useState("");
+  const [botToken, setBotToken] = useState<string | null>(null);
+  const [chatId, setChatId] = useState<string | null>(null);
   const router = useRouter();
 
-  // Load cart items from localStorage on mount
+  // Load cart items and bot settings from localStorage on mount
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
-    }
+    if (storedCart) setCartItems(JSON.parse(storedCart));
+
+    // Load bot settings
+    const storedBotToken = localStorage.getItem("telegram_bot_token");
+    const storedChatId = localStorage.getItem("telegram_chat_id");
+
+    setBotToken(storedBotToken);
+    setChatId(storedChatId);
   }, []);
 
   // Calculate total price
@@ -42,7 +45,13 @@ const Checkout = () => {
 
   // Function to send order summary to Telegram
   const sendOrderToTelegram = async () => {
-    const orderSummary = `
+    if (!botToken || !chatId) {
+      alert("Telegram Bot Token or Chat ID is missing. Please set it in Settings.");
+      return;
+    }
+
+    const parseMode = "HTML";
+    const message = `
 🛒 <b>New Order Received!</b> 🛒
 
 👤 <b>Customer Details:</b>
@@ -55,9 +64,9 @@ const Checkout = () => {
 ${cartItems
   .map(
     (item) =>
-      `🔹 <b>${item.title}</b>  
-   📦 Quantity: ${item.quantity}  
-   💰 Price: $${(item.price * item.quantity).toFixed(2)}`
+      `🔹 <b>${item.title}</b>\n📦 Quantity: ${item.quantity}\n💰 Price: $${(
+        item.price * item.quantity
+      ).toFixed(2)}`
   )
   .join("\n\n")}
 
@@ -66,15 +75,14 @@ ${cartItems
 ✅ <i>Thank you for your order!</i>
 `;
 
+    // Correct Telegram API URL
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(
+      message
+    )}&parse_mode=${parseMode}`;
+
     try {
-      await fetch(TELEGRAM_API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: CHAT_ID,
-          text: orderSummary,
-          parse_mode: "HTML",
-        }),
+      await fetch(url, {
+        method: "GET",
       });
     } catch (error) {
       console.error("Error sending order to Telegram:", error);
@@ -87,6 +95,11 @@ ${cartItems
 
     if (!name || !email || !address) {
       setError("All fields are required.");
+      return;
+    }
+
+    if (!botToken || !chatId) {
+      alert("Telegram settings are missing! Please go to settings and add your Bot Token & Chat ID.");
       return;
     }
 
