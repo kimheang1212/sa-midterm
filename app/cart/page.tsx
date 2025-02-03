@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // Import Next.js router
+import Link from "next/link";
 
 // Define TypeScript Interface for Cart Item
 interface CartItem {
@@ -75,7 +76,7 @@ const Cart: React.FC = () => {
       <h2 className="text-2xl font-bold mb-6">Shopping Cart</h2>
 
       {cartItems.length === 0 ? (
-        <p>Your cart is empty. <a href="/" className="text-blue-500">Go back to shopping.</a></p>
+        <p>Your cart is empty. <Link href="/" className="text-blue-500">Go back to shopping.</Link></p>
       ) : (
         <div className="space-y-6">
           {cartItems.map((item) => (

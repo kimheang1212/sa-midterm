@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import Link from "next/link"
 
 export function LoginForm({
   className,
@@ -14,7 +15,7 @@ export function LoginForm({
       <form>
         <div className="flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2">
-            <a
+            <Link
               href="#"
               className="flex flex-col items-center gap-2 font-medium"
             >
@@ -22,7 +23,7 @@ export function LoginForm({
                 <GalleryVerticalEnd className="size-6" />
               </div>
               <span className="sr-only">Telegram settings</span>
-            </a>
+            </Link>
             <h1 className="text-xl font-bold">Welcome to Telegram Settings</h1>
            
           </div>

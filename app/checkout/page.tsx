@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 // Define TypeScript Interface for Cart Item
 interface CartItem {
@@ -107,9 +108,9 @@ ${cartItems
       {cartItems.length === 0 ? (
         <p>
           Your cart is empty.{" "}
-          <a href="/" className="text-blue-500">
+          <Link href="/" className="text-blue-500">
             Go back to shopping.
-          </a>
+          </Link>
         </p>
       ) : (
         <div>
